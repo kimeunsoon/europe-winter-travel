@@ -22,7 +22,7 @@ alter table public.post_likes enable row level security;
 create policy "Public can read posts" on public.posts for select using (true);
 create policy "Members create own posts" on public.posts for insert to authenticated with check (auth.uid() = user_id and likes = 0 and exists (select 1 from public.memberships m where m.user_id=auth.uid() and m.nickname=author));
 create policy "Public can read rankings" on public.rankings for select using (true);
-create policy "Members submit scores" on public.rankings for insert to authenticated with check (auth.uid() = user_id and exists (select 1 from public.memberships m where m.user_id=auth.uid() and m.nickname=nickname));
+create policy "Members submit scores" on public.rankings for insert to authenticated with check (auth.uid() = user_id and exists (select 1 from public.memberships m where m.user_id=auth.uid() and m.nickname=rankings.nickname));
 create policy "Read own membership" on public.memberships for select to authenticated using (auth.uid() = user_id);
 create policy "Create own membership" on public.memberships for insert to authenticated with check (auth.uid() = user_id);
 create policy "Update own membership" on public.memberships for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
@@ -41,3 +41,4 @@ grant select, insert, update on public.memberships to authenticated;
 grant select on public.post_likes to authenticated;
 create index if not exists posts_created_idx on public.posts(created_at desc);
 create index if not exists rankings_score_idx on public.rankings(score desc, played_at);
+
